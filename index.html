@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1C1C1E">
+<meta name="theme-color" content="#004A99">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,98 +13,144 @@
 <title>현장사진</title>
 <style>
   :root{
-    --bg:#F4F4F1; --card:#FFFFFF; --ink:#151515; --sub:#5E5E5A; --line:#DCDCD6;
-    --accent:#FFC400; --accent-ink:#151515; --dark:#1C1C1E; --ok:#1F8A4C; --warn:#C2410C; --err:#B91C1C;
-    --r:14px;
+    --navy:#004A99; --navy-2:#003A7A; --navy-soft:#E8F0FA; --bg:#F2F5F9; --card:#FFFFFF;
+    --ink:#14213D; --sub:#5B6678; --line:#E1E7EF; --ok:#15803D; --warn:#B45309; --err:#B91C1C;
+    --r:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;
-    font-size:16px;line-height:1.4}
-  header{position:sticky;top:0;z-index:5;background:var(--dark);color:#fff;
-    padding:calc(env(safe-area-inset-top) + 10px) 16px 12px;display:flex;align-items:center;gap:10px}
-  header h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.3px;flex:1}
-  header h1 b{color:var(--accent)}
-  .pill{font-size:13px;font-weight:700;padding:5px 10px;border-radius:99px;background:#3A3A3C;white-space:nowrap}
-  .pill.ok{background:#14532D}.pill.wait{background:#7C2D12}.pill.off{background:#7F1D1D}
-  .iconbtn{background:none;border:0;color:#fff;font-size:22px;padding:4px 6px;cursor:pointer}
-  main{padding:14px 16px calc(env(safe-area-inset-bottom) + 28px);max-width:560px;margin:0 auto}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
-  label.t{display:block;font-size:13px;font-weight:800;color:var(--sub);margin:0 0 8px;letter-spacing:.2px}
+    font-size:16px;line-height:1.45}
+  svg.i{width:22px;height:22px;flex:none}
+  header{position:sticky;top:0;z-index:5;background:rgba(242,245,249,.92);backdrop-filter:blur(8px);
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+  .logo{width:38px;height:38px;border-radius:10px;background:var(--navy);display:grid;place-items:center;overflow:hidden;flex:none}
+  .logo img{width:100%;height:100%;object-fit:contain;background:#fff}
+  .logo img + svg{display:none}
+  .logo svg{width:22px;height:22px;color:#fff}
+  .brand{flex:1;min-width:0;line-height:1.15}
+  .brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.6px;color:var(--navy)}
+  .brand small{font-size:12px;color:var(--sub);font-weight:600}
+  .pill{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:99px;background:#E5E9F0;color:var(--sub);white-space:nowrap}
+  .pill.ok{background:#E3F4EA;color:var(--ok)}.pill.wait{background:#FDF0E1;color:var(--warn)}.pill.off{background:#FDE8E8;color:var(--err)}
+  .iconbtn{background:#fff;border:1px solid var(--line);color:var(--navy);width:38px;height:38px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+  main{padding:16px 16px calc(env(safe-area-inset-bottom) + 28px);max-width:560px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(20,33,61,.04)}
+  .card.top{border-top:4px solid var(--navy)}
+  label.t{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:0 0 10px}
+  label.t em{font-style:normal;font-weight:500}
   select,input[type=text],input[type=url],input[type=password],input[type=tel]{
-    width:100%;font-size:18px;padding:13px 12px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-family:inherit}
-  select:focus,input:focus{outline:none;border-color:var(--ink)}
+    width:100%;font-size:17px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:#F8FAFD;color:var(--ink);font-family:inherit}
+  select:focus,input:focus{outline:none;border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(0,74,153,.12)}
   .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .chip{border:2px solid var(--line);background:#fff;border-radius:10px;padding:13px 4px;font-size:16px;font-weight:700;
+  .chip{border:1px solid var(--line);background:#F8FAFD;border-radius:12px;padding:13px 4px;font-size:15.5px;font-weight:700;
     color:var(--ink);cursor:pointer;font-family:inherit;word-break:keep-all}
-  .chip.on{background:var(--accent);border-color:var(--ink)}
-  .shoot{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-bottom:12px}
-  .btn{border:0;border-radius:var(--r);font-family:inherit;font-weight:800;cursor:pointer;font-size:17px;padding:16px}
-  .btn.big{background:var(--accent);color:var(--accent-ink);font-size:21px;padding:22px 10px;border:2px solid var(--ink)}
-  .btn.sec{background:#fff;color:var(--ink);border:2px solid var(--line)}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn.dark{background:var(--dark);color:#fff;width:100%}
-  .hint{font-size:14px;color:var(--sub);margin:-4px 0 12px;text-align:center}
-  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px}
-  .stat b{display:block;font-size:26px;font-weight:800}
-  .stat span{font-size:13px;color:var(--sub);font-weight:700}
+  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .shoot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
+  .shoot .btn{font-size:19px;padding:20px 10px}
+  .btn{border:0;border-radius:14px;font-family:inherit;font-weight:700;cursor:pointer;font-size:16px;padding:15px;
+    display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn.big{background:var(--navy);color:#fff;font-size:19px;padding:20px 10px;box-shadow:0 6px 16px rgba(0,74,153,.25)}
+  .btn.big:active{background:var(--navy-2)}
+  .btn.sec{background:#fff;color:var(--navy);border:1px solid #C9D5E8}
+  .btn:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+  .btn.dark{background:var(--navy);color:#fff;width:100%}
+  .hint{font-size:13.5px;color:var(--sub);margin:0 0 14px;text-align:center}
+  .hint b{color:var(--navy)}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+  .stat b{display:block;font-size:24px;font-weight:800;color:var(--navy)}
+  .stat span{font-size:12.5px;color:var(--sub);font-weight:600}
   .list{display:flex;flex-direction:column;gap:8px}
-  .row{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
-  .row img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#ddd;flex:none}
+  .row{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px}
+  .row img{width:54px;height:54px;object-fit:cover;border-radius:10px;background:#dde3ec;flex:none}
   .row .m{flex:1;min-width:0}
   .row .m b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .row .m small{display:block;font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .st{font-size:12px;font-weight:800;padding:4px 8px;border-radius:99px;white-space:nowrap}
-  .st.ok{background:#DCFCE7;color:var(--ok)}.st.wait{background:#FFEDD5;color:var(--warn)}.st.err{background:#FEE2E2;color:var(--err)}
+  .row .m small{display:block;font-size:12.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .st{font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;white-space:nowrap}
+  .st.ok{background:#E3F4EA;color:var(--ok)}.st.wait{background:#FDF0E1;color:var(--warn)}.st.err{background:#FDE8E8;color:var(--err)}
   .row .acts{display:flex;flex-direction:column;gap:4px}
-  .row .acts button{font-size:12px;font-weight:800;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 8px;font-family:inherit}
-  h2{font-size:15px;margin:18px 2px 8px;color:var(--sub);font-weight:800}
-  .empty{text-align:center;color:var(--sub);font-size:14px;padding:16px}
+  .row .acts button{font-size:12px;font-weight:700;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 8px;font-family:inherit;color:var(--navy)}
+  h2{font-size:14px;margin:20px 4px 10px;color:var(--sub);font-weight:700}
+  .empty{text-align:center;color:var(--sub);font-size:14px;padding:18px;background:#fff;border:1px dashed var(--line);border-radius:14px}
   .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translateX(-50%) translateY(20px);
-    background:var(--dark);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;font-size:15px;opacity:0;transition:.25s;
+    background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:14.5px;opacity:0;transition:.25s;
     z-index:20;max-width:90vw;text-align:center;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  dialog{border:0;border-radius:18px;padding:0;width:min(92vw,460px)}
-  dialog::backdrop{background:rgba(0,0,0,.5)}
-  .dlg{padding:18px}
-  .dlg h3{margin:0 0 14px;font-size:20px}
+  dialog{border:0;border-radius:22px;padding:0;width:min(92vw,440px);border-top:5px solid var(--navy);box-shadow:0 20px 50px rgba(20,33,61,.18)}
+  dialog::backdrop{background:rgba(20,33,61,.35)}
+  dialog.welcome::backdrop{background:var(--bg)}
+  .dlg{padding:26px 22px 22px}
+  .welcome-top{display:none;text-align:center;margin-bottom:18px}
+  dialog.welcome .welcome-top{display:block}
+  dialog.welcome .dlg > h3{display:none}
+  .cam{width:64px;height:64px;border-radius:18px;background:var(--navy-soft);display:grid;place-items:center;margin:0 auto 14px;color:var(--navy)}
+  .cam svg{width:30px;height:30px}
+  .eyebrow{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px}
+  .welcome-top h3{font-size:24px;margin:6px 0 8px;font-weight:800;color:var(--ink)}
+  .welcome-top p{margin:0;color:var(--sub);font-size:14.5px}
+  .dlg > h3{margin:0 0 16px;font-size:20px}
   .field{margin-bottom:14px}
-  .switch{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700}
-  .switch input{width:24px;height:24px}
-  .dlg .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-  .err-msg{color:var(--err);font-weight:700;font-size:14px;min-height:20px;margin:4px 0 8px}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;font-size:15px}
+  .switch input{width:22px;height:22px;accent-color:var(--navy)}
+  .dlg .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+  dialog.welcome .btns{grid-template-columns:1fr}
+  .err-msg{color:var(--err);font-weight:600;font-size:13.5px;min-height:20px;margin:2px 0 8px}
+  .foot{text-align:center;color:var(--sub);font-size:12.5px;margin-top:14px}
   input[type=file]{display:none}
-  .busy{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:30;color:#fff;font-weight:800;font-size:18px}
+  .busy{position:fixed;inset:0;background:rgba(20,33,61,.45);display:none;align-items:center;justify-content:center;z-index:30;color:#fff;font-weight:700;font-size:17px}
   .busy.show{display:flex}
+  .row .del{font-size:12px;font-weight:700;border:1px solid #F3C9C9;background:#fff;color:var(--err);border-radius:8px;padding:6px 9px;font-family:inherit;cursor:pointer}
+  .morebtn{width:100%;margin-top:10px;background:#fff;color:var(--navy);border:1px solid #C9D5E8}
+  dialog.full{width:min(100vw,560px);max-width:100vw;height:100dvh;max-height:100dvh;margin:0 auto;border-radius:0;border-top:0;background:var(--bg)}
+  .fullhead{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px}
+  .fullhead b{flex:1;font-size:17px}
+  .fullbody{padding:14px 16px calc(env(safe-area-inset-bottom) + 24px)}
+  .dayhead{font-size:13px;font-weight:700;color:var(--sub);margin:14px 4px 8px}
+  .savebar{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:15;max-width:536px;margin:0 auto;
+    background:#fff;border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:16px;padding:12px 12px 12px 16px;
+    display:none;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(20,33,61,.18)}
+  .savebar.show{display:flex}
+  .savebar span{flex:1;font-size:14.5px;font-weight:600}
+  .savebar .btn{padding:11px 16px;font-size:15px;background:var(--navy);color:#fff}
+  .savebar .x{background:none;border:0;font-size:22px;color:var(--sub);padding:4px 6px;cursor:pointer}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="ic-helmet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"/><path d="M5 18v-2a7 7 0 0 1 14 0v2"/><path d="M10 9V6h4v3"/></symbol>
+  <symbol id="ic-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+  <symbol id="ic-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+</svg>
+
 <header>
-  <h1>현장<b>사진</b></h1>
+  <span class="logo"><img src="logo.png" alt="" onerror="this.remove()"><svg><use href="#ic-helmet"/></svg></span>
+  <div class="brand"><b>WOOMI SITE PHOTO</b><small id="who">현장기록 · 사진관리</small></div>
   <span id="netPill" class="pill">확인 중</span>
-  <button class="iconbtn" id="btnSettings" aria-label="설정">⚙︎</button>
+  <button class="iconbtn" id="btnSettings" aria-label="설정"><svg class="i"><use href="#ic-gear"/></svg></button>
 </header>
 
 <main>
-  <div class="card">
+  <div class="card top">
     <label class="t" for="site">현장</label>
     <select id="site"></select>
   </div>
 
   <div class="card">
-    <label class="t">공정 <span style="font-weight:600">— 먼저 선택하세요</span></label>
+    <label class="t">공정 <em>· 먼저 선택하세요</em></label>
     <div class="chips" id="chips"></div>
   </div>
 
   <div class="card">
-    <label class="t" for="memo">메모 (선택) — 파일명에 들어갑니다</label>
+    <label class="t" for="memo">메모 <em>· 선택, 파일명에 들어갑니다</em></label>
     <input type="text" id="memo" placeholder="예: 3층 슬래브, B동 북측" maxlength="30">
   </div>
 
   <div class="shoot">
-    <button class="btn big" id="btnShoot" disabled>📷 촬영</button>
-    <button class="btn sec" id="btnAlbum" disabled>🖼 앨범</button>
+    <button class="btn big" id="btnShoot" disabled><svg class="i"><use href="#ic-camera"/></svg>촬영</button>
+    <button class="btn sec" id="btnAlbum" disabled><svg class="i"><use href="#ic-image"/></svg>앨범</button>
   </div>
   <p class="hint" id="hint">공정을 선택하면 촬영할 수 있습니다</p>
   <input type="file" id="fileCam" accept="image/*" capture="environment">
@@ -117,13 +163,20 @@
 
   <h2>최근 사진</h2>
   <div class="list" id="list"></div>
+  <button class="btn morebtn" id="btnMine">내 사진 더 보기 (최근 7일)</button>
 </main>
 
 <dialog id="dlg">
   <form class="dlg" method="dialog" id="setForm">
+    <div class="welcome-top">
+      <div class="cam"><svg><use href="#ic-camera"/></svg></div>
+      <div class="eyebrow">현장기록 · 사진관리</div>
+      <h3>현장 기록을 시작하세요</h3>
+      <p>이름과 접속코드를 입력하면<br>찍은 사진이 부서·공정별로 자동 저장됩니다.</p>
+    </div>
     <h3>설정</h3>
     <div class="field">
-      <label class="t" for="fName">내 이름</label>
+      <label class="t" for="fName">이름 <em>· 관리자에게 등록된 이름</em></label>
       <input type="text" id="fName" placeholder="홍길동" maxlength="12" required>
     </div>
     <div class="field">
@@ -131,21 +184,35 @@
       <input type="tel" id="fKey" placeholder="관리자에게 받은 6자리" required>
     </div>
     <div class="field" id="urlField">
-      <label class="t" for="fUrl">서버 주소 (관리자용)</label>
+      <label class="t" for="fUrl">서버 주소 <em>· 관리자용</em></label>
       <input type="url" id="fUrl" placeholder="https://script.google.com/macros/s/.../exec">
     </div>
     <div class="field switch">
       <span>사진에 날짜·현장·공정 표시</span>
       <input type="checkbox" id="fWm">
     </div>
+    <div class="field switch">
+      <span>촬영 후 '폰에 저장' 버튼 보이기</span>
+      <input type="checkbox" id="fSave">
+    </div>
     <div class="err-msg" id="setErr"></div>
     <div class="btns">
       <button class="btn sec" type="button" id="btnCancel">닫기</button>
       <button class="btn dark" type="submit" id="btnSave">저장</button>
     </div>
+    <p class="foot">별도 회원가입 없이 사용합니다</p>
   </form>
 </dialog>
 
+<dialog id="mineDlg" class="full">
+  <div class="fullhead"><b>내 사진 · 최근 7일</b><button class="iconbtn" id="mineClose" aria-label="닫기">×</button></div>
+  <div class="fullbody">
+    <p class="hint" style="text-align:left;margin:0 4px 6px">이 폰에서 올린 사진만 보이며, 본인이 삭제할 수 있습니다. 삭제한 사진은 관리자가 30일 안에 복구할 수 있습니다.</p>
+    <div class="list" id="mineList"></div>
+    <button class="btn morebtn" id="mineMore" style="display:none">더 불러오기</button>
+  </div>
+</dialog>
+<div class="savebar" id="saveBar"><span id="saveTxt">방금 찍은 사진</span><button class="btn" id="btnSaveLocal">폰에 저장</button><button class="x" id="btnSaveX" aria-label="닫기">×</button></div>
 <div class="busy" id="busy">사진 준비 중…</div>
 <div class="toast" id="toast"></div>
 
@@ -153,8 +220,8 @@
 /* ===== 관리자: 배포 전에 Apps Script 웹앱 주소를 여기에 넣으면 직원은 이름·코드만 입력하면 됩니다 ===== */
 const DEFAULT_SERVER_URL = 'https://script.google.com/macros/s/AKfycbw5V6kQGX6P131yanhHvuiuZ7o6l8bkg9WxVZ6aF0a-m8we6eNIr9e7CxgFNeZ3BEQPGA/exec';
 
-const MAX_SIDE = 2048;      // 긴 변 최대 픽셀 (용량 절감)
-const JPEG_Q = 0.82;        // JPEG 품질
+const MAX_SIDE = 1600;      // 긴 변 최대 픽셀 (용량·속도 절감, 현장 기록용으로 충분)
+const JPEG_Q = 0.75;        // JPEG 품질
 const $ = s => document.querySelector(s);
 const LS = {
   get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
@@ -211,7 +278,9 @@ function renderPickers(){
 function updateShootState(){
   const ready = sel.site && sel.process;
   $('#btnShoot').disabled = !ready; $('#btnAlbum').disabled = !ready;
-  $('#hint').textContent = ready ? `${sel.site} › ${sel.process} 폴더로 저장됩니다` : '공정을 선택하면 촬영할 수 있습니다';
+  const dp = settings.dept ? `${esc(settings.dept)} › ` : '';
+  $('#hint').innerHTML = ready ? `<b>${dp}${esc(sel.site)} › ${esc(sel.process)}</b> 폴더로 저장됩니다` : '공정을 선택하면 촬영할 수 있습니다';
+  $('#who').textContent = settings.name ? `${settings.dept ? settings.dept + ' · ' : ''}${settings.name}` : '현장기록 · 사진관리';
 }
 
 async function renderList(){
@@ -233,9 +302,9 @@ async function renderList(){
     else st = `<span class="st wait">${i.tries ? '재시도 대기' : '대기'}</span>`;
     const sub = i._q && i.error ? esc(i.error) : `${when} · ${esc(i.memo || '')}`;
     const acts = i._q && i.status === 'fatal'
-      ? `<div class="acts"><button data-retry="${i.id}">다시</button><button data-del="${i.id}">삭제</button></div>` : '';
-    const open = !i._q && i.url ? `onclick="window.open('${i.url}','_blank')"` : '';
-    return `<div class="row" ${open}><img src="${i.thumb}" alt=""><div class="m"><b>${esc(i.site)} › ${esc(i.process)}</b><small>${sub}</small></div>${st}${acts}</div>`;
+      ? `<div class="acts"><button data-retry="${i.id}">다시</button><button data-del="${i.id}">삭제</button></div>`
+      : (!i._q && i.fileId ? `<button class="del" data-fid="${i.fileId}">삭제</button>` : '');
+    return `<div class="row"><img src="${i.thumb}" alt=""><div class="m"><b>${esc(i.process)}</b><small>${sub}</small></div>${st}${acts}</div>`;
   }).join('') : '<div class="empty">아직 찍은 사진이 없습니다</div>';
   updatePill(q);
 }
@@ -253,37 +322,47 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 async function loadConfig(fresh){
   if (!settings.url || !settings.key) return false;
   try {
-    const r = await fetch(`${settings.url}?action=config&key=${encodeURIComponent(settings.key)}${fresh ? '&fresh=1' : ''}`);
+    const r = await fetch(`${settings.url}?action=config&key=${encodeURIComponent(settings.key)}&name=${encodeURIComponent(settings.name)}${fresh ? '&fresh=1' : ''}`);
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '설정을 불러오지 못했습니다');
     config = { sites: j.sites, processes: j.processes };
     LS.set('config', config);
+    if (j.dept && settings.dept !== j.dept) { settings.dept = j.dept; LS.set('settings', settings); }
     renderPickers();
     return true;
   } catch (e) {
-    if (!config.sites.length) toast('현장 목록을 불러오지 못했습니다: ' + e.message, 3500);
+    if (!config.sites.length && !$('#dlg').open) toast('현장 목록을 불러오지 못했습니다: ' + e.message, 3500);
     throw e;
   }
 }
 
+const PARALLEL = 2;          // 동시에 올리는 사진 수
 let pumping = false;
+const inFlight = new Set();
 async function pump(){
   if (pumping || !navigator.onLine || !settings.url) return;
   pumping = true;
   try {
-    while (true) {
+    await Promise.all(Array.from({ length: PARALLEL }, () => worker()));
+  } finally {
+    pumping = false;
+    renderList();
+  }
+}
+async function worker(){
+    while (navigator.onLine) {
       const now = Date.now();
-      const items = (await DB.all())
-        .filter(i => i.status !== 'fatal' && (i.nextTry || 0) <= now)
-        .sort((a, b) => a.takenAt - b.takenAt);
-      if (!items.length) break;
-      const it = items[0];
+      const it = (await DB.all())
+        .filter(i => i.status !== 'fatal' && (i.nextTry || 0) <= now && !inFlight.has(i.id))
+        .sort((a, b) => a.takenAt - b.takenAt)[0];
+      if (!it) break;
+      inFlight.add(it.id);
       try {
         const res = await fetch(settings.url, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            key: settings.key, id: it.id, site: it.site, process: it.process,
+            key: settings.key, device: DEVICE, id: it.id, site: it.site, process: it.process,
             memo: it.memo, author: it.author, takenAt: it.takenAt, data: it.data
           })
         });
@@ -291,7 +370,7 @@ async function pump(){
         if (j.ok) {
           await DB.del(it.id);
           const done = LS.get('done', []);
-          done.unshift({ id: it.id, site: it.site, process: it.process, memo: it.memo, takenAt: it.takenAt, thumb: it.thumb, url: j.url });
+          done.unshift({ id: it.id, site: it.site, process: it.process, memo: it.memo, takenAt: it.takenAt, thumb: it.thumb, url: j.url, fileId: j.fileId });
           LS.set('done', done.slice(0, 60));
         } else if (j.fatal) {
           await DB.put({ ...it, status: 'fatal', error: j.error });
@@ -302,14 +381,11 @@ async function pump(){
         const tries = (it.tries || 0) + 1;
         const wait = Math.min(15 * 60e3, 10e3 * 2 ** Math.min(tries, 7));
         await DB.put({ ...it, tries, nextTry: Date.now() + wait, error: '전송 실패 · 자동 재시도' });
-        if (!navigator.onLine) break;
+      } finally {
+        inFlight.delete(it.id);
       }
       await renderList();
     }
-  } finally {
-    pumping = false;
-    renderList();
-  }
 }
 
 /* ---------- 사진 처리 ---------- */
@@ -398,8 +474,11 @@ function openSettings(force){
   $('#fKey').value = settings.key || '';
   $('#fUrl').value = settings.url || '';
   $('#fWm').checked = !!settings.wm;
+  $('#fSave').checked = settings.saveLocal !== false;
   $('#urlField').style.display = (DEFAULT_SERVER_URL && settings.url === DEFAULT_SERVER_URL) ? 'none' : '';
   $('#btnCancel').style.display = force ? 'none' : '';
+  $('#dlg').classList.toggle('welcome', !!force);
+  $('#btnSave').textContent = force ? '시작하기' : '저장';
   $('#setErr').textContent = '';
   $('#dlg').showModal();
 }
@@ -408,7 +487,7 @@ $('#setForm').addEventListener('submit', async e => {
   e.preventDefault();
   const next = {
     name: $('#fName').value.trim(), key: $('#fKey').value.trim(),
-    url: ($('#fUrl').value.trim() || DEFAULT_SERVER_URL), wm: $('#fWm').checked
+    url: ($('#fUrl').value.trim() || DEFAULT_SERVER_URL), wm: $('#fWm').checked, saveLocal: $('#fSave').checked
   };
   if (!next.name || !next.key || !next.url) { $('#setErr').textContent = '이름, 접속코드, 서버 주소를 모두 입력하세요'; return; }
   $('#btnSave').disabled = true; $('#setErr').textContent = '연결 확인 중…';
@@ -417,7 +496,7 @@ $('#setForm').addEventListener('submit', async e => {
     await loadConfig(true);
     LS.set('settings', settings);
     $('#dlg').close();
-    toast('설정 저장 완료');
+    toast(settings.dept ? `${settings.dept} 부서로 등록되었습니다` : '설정 저장 완료');
     pump();
   } catch (err) {
     settings = prev;
@@ -437,8 +516,97 @@ $('#chips').onclick = e => {
 };
 $('#btnShoot').onclick = () => $('#fileCam').click();
 $('#btnAlbum').onclick = () => $('#fileAlbum').click();
-['#fileCam', '#fileAlbum'].forEach(s => $(s).onchange = e => { const f = [...e.target.files]; e.target.value = ''; handleFiles(f); });
+['#fileCam', '#fileAlbum'].forEach(s => $(s).onchange = e => {
+  const f = [...e.target.files]; e.target.value = '';
+  if (s === '#fileCam' && f.length && settings.saveLocal !== false) {
+    lastShots = lastShots.concat(f).slice(-20);
+    $('#saveTxt').textContent = `방금 찍은 사진 ${lastShots.length}장`;
+    $('#saveBar').classList.add('show');
+  }
+  handleFiles(f);
+});
+
+/* ---------- 폰 갤러리에 저장 ---------- */
+let lastShots = [];
+function shotName(i){
+  const d = new Date(), p2 = n => String(n).padStart(2, '0');
+  return `현장사진_${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}${p2(d.getSeconds())}_${i + 1}.jpg`;
+}
+$('#btnSaveLocal').onclick = async () => {
+  const files = lastShots.map((f, i) => new File([f], shotName(i), { type: f.type || 'image/jpeg' }));
+  if (!files.length) return;
+  try {
+    if (navigator.canShare && navigator.canShare({ files })) {
+      await navigator.share({ files });   // 아이폰: '이미지 저장' / 안드로이드: '갤러리' 등 선택
+    } else {
+      files.forEach(f => {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name;
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      });
+      toast('다운로드 폴더에 저장했습니다');
+    }
+    lastShots = []; $('#saveBar').classList.remove('show');
+  } catch (e) {
+    if (e && e.name !== 'AbortError') toast('저장하지 못했습니다: ' + e.message, 3000);
+  }
+};
+$('#btnSaveX').onclick = () => { lastShots = []; $('#saveBar').classList.remove('show'); };
+/* ---------- 본인 사진 삭제 · 내 사진 보기 ---------- */
+const DEVICE = LS.get('device', '') || (() => {
+  const d = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  LS.set('device', d); return d;
+})();
+async function api(body){
+  const r = await fetch(settings.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ key: settings.key, device: DEVICE, ...body }) });
+  return r.json();
+}
+async function deletePhoto(fileId, btn){
+  if (!confirm('이 사진을 삭제할까요?\n드라이브 휴지통으로 이동하며, 관리자가 30일 안에 복구할 수 있습니다.')) return false;
+  if (btn) { btn.disabled = true; btn.textContent = '삭제 중'; }
+  try {
+    const j = await api({ action: 'delete', fileId });
+    if (!j.ok) throw new Error(j.error || '삭제 실패');
+    LS.set('done', LS.get('done', []).filter(d => d.fileId !== fileId));
+    renderList(); toast('삭제했습니다');
+    return true;
+  } catch (e) {
+    toast(navigator.onLine ? e.message : '연결된 상태에서 삭제할 수 있습니다', 3000);
+    if (btn) { btn.disabled = false; btn.textContent = '삭제'; }
+    return false;
+  }
+}
+let minePage = 0, mineLastDay = '';
+async function loadMine(){
+  const box = $('#mineList'), more = $('#mineMore');
+  more.style.display = 'none';
+  const wait = document.createElement('div'); wait.className = 'empty'; wait.textContent = '불러오는 중…'; box.appendChild(wait);
+  try {
+    const j = await api({ action: 'mine', page: minePage });
+    wait.remove();
+    if (!j.ok) throw new Error(j.error || '불러오지 못했습니다');
+    if (!j.items.length && minePage === 0) { box.innerHTML = '<div class="empty">최근 7일 동안 이 폰에서 올린 사진이 없습니다</div>'; return; }
+    let html = '';
+    j.items.forEach(it => {
+      const day = it.taken.slice(0, 10);
+      if (day !== mineLastDay) { mineLastDay = day; html += `<div class="dayhead">${day}</div>`; }
+      html += `<div class="row"><img src="${it.thumb || ''}" alt=""><div class="m"><b>${esc(it.process)}</b><small>${it.taken.slice(11, 16)} · ${esc(it.memo || '')}</small></div><button class="del" data-fid="${esc(it.id)}">삭제</button></div>`;
+    });
+    box.insertAdjacentHTML('beforeend', html);
+    if (j.more) more.style.display = '';
+  } catch (e) { wait.textContent = navigator.onLine ? e.message : '연결된 상태에서 볼 수 있습니다'; }
+}
+$('#btnMine').onclick = () => { minePage = 0; mineLastDay = ''; $('#mineList').innerHTML = ''; $('#mineDlg').showModal(); loadMine(); };
+$('#mineMore').onclick = () => { minePage++; loadMine(); };
+$('#mineClose').onclick = () => $('#mineDlg').close();
+$('#mineList').onclick = async e => {
+  const b = e.target.closest('[data-fid]'); if (!b) return;
+  if (await deletePhoto(b.dataset.fid, b)) b.closest('.row').remove();
+};
+
 $('#list').onclick = async e => {
+  const f = e.target.closest('[data-fid]');
+  if (f) { e.stopPropagation(); return deletePhoto(f.dataset.fid, f); }
   const r = e.target.dataset.retry, d = e.target.dataset.del;
   if (r) { const it = (await DB.all()).find(x => x.id === r); if (it) await DB.put({ ...it, status: 'wait', tries: 0, nextTry: 0, error: '' }); await loadConfig(true).catch(() => {}); pump(); }
   if (d && confirm('이 사진을 삭제할까요? (드라이브에 저장되지 않은 사진입니다)')) { await DB.del(d); renderList(); }

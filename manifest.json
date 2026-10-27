@@ -1,16 +1,26 @@
 {
-  "name": "현장사진",
+  "name": "우미 현장사진",
   "short_name": "현장사진",
-  "description": "현장 사진을 공정별로 자동 분류해 저장합니다",
+  "description": "우미 현장 사진을 부서·공정별로 자동 분류해 저장합니다",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1C1C1E",
-  "theme_color": "#1C1C1E",
+  "background_color": "#004A99",
+  "theme_color": "#004A99",
   "lang": "ko",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

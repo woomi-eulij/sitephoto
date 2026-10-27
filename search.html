@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#004A99">
+<meta name="robots" content="noindex">
+<title>사진 찾기 · 우미 현장사진</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{--navy:#004A99;--navy-2:#003A7A;--soft:#E8F0FA;--bg:#F2F5F9;--card:#fff;--ink:#14213D;--sub:#5B6678;--line:#E1E7EF;--err:#B91C1C;--ok:#15803D}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;font-size:15px;line-height:1.45}
+  header{position:sticky;top:0;z-index:5;background:rgba(242,245,249,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;gap:10px}
+  .logo{width:38px;height:38px;border-radius:10px;background:#fff;border:1px solid var(--line);overflow:hidden;flex:none}
+  .logo img{width:100%;height:100%;object-fit:contain}
+  .brand{flex:1;line-height:1.15}.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.6px;color:var(--navy)}.brand small{font-size:12px;color:var(--sub);font-weight:600}
+  .ghost{background:#fff;border:1px solid var(--line);color:var(--navy);border-radius:10px;padding:8px 12px;font:inherit;font-weight:700;cursor:pointer}
+  main{max-width:1180px;margin:0 auto;padding:16px 16px 120px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+  .card.top{border-top:4px solid var(--navy)}
+  label.t{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:0 0 6px}
+  input,select{width:100%;font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#F8FAFD;color:var(--ink)}
+  input:focus,select:focus{outline:none;border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(0,74,153,.12)}
+  .btn{border:0;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;padding:11px 16px;background:var(--navy);color:#fff;white-space:nowrap}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.sec{background:#fff;color:var(--navy);border:1px solid #C9D5E8}
+  .ai{display:flex;gap:8px}.ai input{flex:1}
+  .ai-note{font-size:12.5px;color:var(--sub);margin:8px 2px 0}
+  .ai-note b{color:var(--navy)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .filters{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .quick button{background:var(--soft);color:var(--navy);border:0;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .sum{display:flex;align-items:center;gap:10px;margin:18px 4px 10px;color:var(--sub);font-weight:700;font-size:14px}
+  .sum span{flex:1}
+  .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  .ph{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;cursor:pointer}
+  .ph.sel{outline:3px solid var(--navy);outline-offset:-3px}
+  .ph .img{aspect-ratio:4/3;background:#dfe5ee center/cover no-repeat}
+  .ph .chk{position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.92);border:2px solid #9FB3CF;display:grid;place-items:center;font-weight:900;color:#fff}
+  .ph.sel .chk{background:var(--navy);border-color:var(--navy)}
+  .ph .cap{padding:8px 10px}
+  .ph .cap b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ph .cap small{display:block;font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ph .open{position:absolute;top:8px;right:8px;background:rgba(20,33,61,.7);color:#fff;border:0;border-radius:8px;font:inherit;font-size:12px;font-weight:700;padding:4px 8px;cursor:pointer}
+  .empty{text-align:center;color:var(--sub);padding:28px;background:#fff;border:1px dashed var(--line);border-radius:14px}
+  .bar{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);max-width:760px;margin:0 auto;z-index:10;background:#fff;border:1px solid var(--line);
+    border-left:5px solid var(--navy);border-radius:16px;padding:10px 12px 10px 16px;display:none;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(20,33,61,.18)}
+  .bar.show{display:flex}.bar span{flex:1;font-weight:700}
+  .login{max-width:420px;margin:8vh auto;text-align:center}
+  .login h1{font-size:22px;margin:4px 0 6px}.login p{color:var(--sub);margin:0 0 16px}
+  .login .field{text-align:left;margin-bottom:12px}
+  .err{color:var(--err);font-weight:600;font-size:13.5px;min-height:20px}
+  .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 70px);transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;opacity:0;transition:.25s;z-index:30;pointer-events:none;max-width:90vw;text-align:center}
+  .toast.show{opacity:1}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo"><img src="logo.png" alt=""></span>
+  <div class="brand"><b>WOOMI SITE PHOTO</b><small>사진 찾기 · 관리자</small></div>
+  <button class="ghost hide" id="btnOut">나가기</button>
+</header>
+
+<main>
+  <!-- 로그인 -->
+  <section class="card top login" id="loginBox">
+    <h1>사진 찾기</h1>
+    <p>관리자 코드를 입력하세요</p>
+    <div class="field" id="urlField"><label class="t" for="lUrl">서버 주소</label><input id="lUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div class="field"><label class="t" for="lKey">관리자 코드</label><input id="lKey" type="password" inputmode="numeric" placeholder="8자리"></div>
+    <div class="err" id="lErr"></div>
+    <button class="btn" id="btnLogin" style="width:100%">들어가기</button>
+  </section>
+
+  <!-- 검색 -->
+  <section id="app" class="hide">
+    <div class="card top">
+      <label class="t" for="aiText">AI로 찾기 · 문장으로 입력하세요</label>
+      <div class="ai"><input id="aiText" placeholder="예: 지난주 김철수가 찍은 3층 슬래브 철근 사진"><button class="btn" id="btnAi">AI로 찾기</button></div>
+      <p class="ai-note" id="aiNote"></p>
+    </div>
+
+    <div class="card">
+      <div class="grid filters">
+        <div><label class="t" for="fFrom">시작일</label><input type="date" id="fFrom"></div>
+        <div><label class="t" for="fTo">종료일</label><input type="date" id="fTo"></div>
+        <div><label class="t" for="fSite">현장</label><select id="fSite"></select></div>
+        <div><label class="t" for="fDept">부서</label><select id="fDept"></select></div>
+        <div><label class="t" for="fProc">공정</label><select id="fProc"></select></div>
+        <div><label class="t" for="fAuthor">촬영자</label><select id="fAuthor"></select></div>
+        <div style="grid-column:span 2"><label class="t" for="fQ">단어 (메모·파일명, 띄어쓰기로 여러 개)</label><input id="fQ" placeholder="예: 3층 슬래브"></div>
+      </div>
+      <div class="quick">
+        <button data-q="today">오늘</button><button data-q="7">최근 7일</button><button data-q="30">최근 30일</button><button data-q="month">이번 달</button><button data-q="all">전체 기간</button>
+      </div>
+      <div class="actions"><button class="btn sec" id="btnReset">초기화</button><button class="btn" id="btnSearch">검색</button></div>
+    </div>
+
+    <div class="sum"><span id="sumTxt"></span><button class="ghost hide" id="btnAll">이 페이지 전체 선택</button></div>
+    <div class="photos" id="photos"></div>
+    <button class="btn sec hide" id="btnMore" style="width:100%;margin-top:12px">더 불러오기</button>
+  </section>
+</main>
+
+<div class="bar" id="bar"><span id="barTxt"></span><button class="btn sec" id="btnClear">선택 해제</button><button class="btn" id="btnZip">내려받기</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* 관리자: 직원 앱과 같은 서버 주소 */
+const DEFAULT_SERVER_URL = 'https://script.google.com/macros/s/AKfycbw5V6kQGX6P131yanhHvuiuZ7o6l8bkg9WxVZ6aF0a-m8we6eNIr9e7CxgFNeZ3BEQPGA/exec';
+const MAX_DL = 30;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const SS = { get(k){ try { return sessionStorage.getItem(k); } catch (e) { return null; } }, set(k, v){ try { sessionStorage.setItem(k, v); } catch (e) {} }, del(k){ try { sessionStorage.removeItem(k); } catch (e) {} } };
+function toast(m, ms = 2400){ const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms); }
+
+let URL_ = SS.get('url') || DEFAULT_SERVER_URL, KEY = SS.get('adminKey') || '';
+let CFG = null, page = 0, lastFilters = null;
+const selected = new Map();   // fileId -> name
+
+async function call(body){
+  const r = await fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ adminKey: KEY, ...body }) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || '서버 오류');
+  return j;
+}
+
+/* ---------- 로그인 ---------- */
+if (DEFAULT_SERVER_URL) $('#urlField').classList.add('hide');
+async function login(){
+  $('#lErr').textContent = '확인 중…';
+  try {
+    CFG = await call({ action: 'adminConfig' });
+    SS.set('url', URL_); SS.set('adminKey', KEY);
+    $('#loginBox').classList.add('hide'); $('#app').classList.remove('hide'); $('#btnOut').classList.remove('hide');
+    fillSelects(); setQuick('7'); doSearch();
+  } catch (e) { $('#lErr').textContent = e.message; KEY = ''; }
+}
+$('#btnLogin').onclick = () => { URL_ = $('#lUrl').value.trim() || DEFAULT_SERVER_URL; KEY = $('#lKey').value.trim(); login(); };
+$('#lKey').onkeydown = e => { if (e.key === 'Enter') $('#btnLogin').click(); };
+$('#btnOut').onclick = () => { SS.del('adminKey'); location.reload(); };
+
+/* ---------- 필터 ---------- */
+const opt = (v, t) => `<option value="${esc(v)}">${esc(t ?? v)}</option>`;
+function fillSelects(){
+  $('#fSite').innerHTML = opt('', '전체') + CFG.sites.map(s => opt(s)).join('');
+  $('#fDept').innerHTML = opt('', '전체') + CFG.depts.map(d => opt(d)).join('');
+  $('#fAuthor').innerHTML = opt('', '전체') + CFG.staff.slice().sort().map(n => opt(n)).join('');
+  fillProc();
+  if (!CFG.ai) { $('#btnAi').disabled = true; $('#aiNote').textContent = 'AI 문장 검색은 아직 설정되지 않았습니다. 아래 조건으로 찾을 수 있습니다.'; }
+}
+function fillProc(){
+  const d = $('#fDept').value, cur = $('#fProc').value;
+  const list = d ? (CFG.byDept[d] || []) : [...new Set(Object.values(CFG.byDept).flat())];
+  $('#fProc').innerHTML = opt('', '전체') + list.map(p => opt(p)).join('');
+  if (list.includes(cur)) $('#fProc').value = cur;
+}
+$('#fDept').onchange = fillProc;
+const ymd = d => new Date(d.getTime() + 9 * 36e5).toISOString().slice(0, 10);   // 한국 날짜
+function setQuick(k){
+  const now = new Date();
+  if (k === 'all') { $('#fFrom').value = ''; $('#fTo').value = ''; return; }
+  $('#fTo').value = ymd(now);
+  if (k === 'today') $('#fFrom').value = ymd(now);
+  else if (k === 'month') $('#fFrom').value = ymd(now).slice(0, 8) + '01';
+  else $('#fFrom').value = ymd(new Date(now - (Number(k) - 1) * 864e5));
+}
+document.querySelector('.quick').onclick = e => { const k = e.target.dataset.q; if (k) { setQuick(k); doSearch(); } };
+$('#btnReset').onclick = () => { ['#fSite', '#fDept', '#fAuthor', '#fQ'].forEach(s => $(s).value = ''); fillProc(); $('#fProc').value = ''; setQuick('7'); $('#aiNote').textContent = ''; doSearch(); };
+$('#btnSearch').onclick = () => doSearch();
+$('#fQ').onkeydown = e => { if (e.key === 'Enter') doSearch(); };
+
+function readFilters(){
+  return { from: $('#fFrom').value, to: $('#fTo').value, site: $('#fSite').value, dept: $('#fDept').value,
+    process: $('#fProc').value, author: $('#fAuthor').value, q: $('#fQ').value.trim() };
+}
+function applyFilters(f){
+  $('#fFrom').value = f.from || ''; $('#fTo').value = f.to || '';
+  $('#fSite').value = CFG.sites.includes(f.site) ? f.site : '';
+  $('#fDept').value = CFG.depts.includes(f.dept) ? f.dept : ''; fillProc();
+  $('#fProc').value = [...$('#fProc').options].some(o => o.value === f.process) ? f.process : '';
+  $('#fAuthor').value = CFG.staff.includes(f.author) ? f.author : '';
+  $('#fQ').value = f.q || '';
+}
+
+/* ---------- AI 문장 검색 ---------- */
+$('#btnAi').onclick = async () => {
+  const text = $('#aiText').value.trim(); if (!text) return $('#aiText').focus();
+  $('#btnAi').disabled = true; $('#aiNote').textContent = 'AI가 검색 조건을 정리하는 중…';
+  try {
+    const { filters } = await call({ action: 'parse', text });
+    applyFilters(filters);
+    const f = readFilters();
+    const parts = [f.from || f.to ? `${f.from || '처음'} ~ ${f.to || '오늘'}` : '전체 기간', f.site, f.dept, f.process, f.author, f.q && `"${f.q}"`].filter(Boolean);
+    $('#aiNote').innerHTML = `AI가 이해한 조건: <b>${esc(parts.join(' · '))}</b> (아래에서 바로 고칠 수 있습니다)`;
+    doSearch();
+  } catch (e) { $('#aiNote').textContent = 'AI 검색 실패: ' + e.message; }
+  finally { $('#btnAi').disabled = false; }
+};
+$('#aiText').onkeydown = e => { if (e.key === 'Enter') $('#btnAi').click(); };
+
+/* ---------- 검색 결과 ---------- */
+async function doSearch(more){
+  if (!more) { page = 0; lastFilters = readFilters(); $('#photos').innerHTML = ''; }
+  $('#btnMore').classList.add('hide');
+  $('#sumTxt').textContent = '검색 중…';
+  try {
+    const j = await call({ action: 'search', filters: lastFilters, page });
+    $('#sumTxt').textContent = `${j.total.toLocaleString()}장`;
+    $('#btnAll').classList.toggle('hide', !j.total);
+    if (!j.total) { $('#photos').innerHTML = '<div class="empty">조건에 맞는 사진이 없습니다</div>'; return; }
+    $('#photos').insertAdjacentHTML('beforeend', j.items.map(card).join(''));
+    if (j.more) $('#btnMore').classList.remove('hide');
+  } catch (e) { $('#sumTxt').textContent = '검색 실패: ' + e.message; }
+}
+function card(it){
+  const on = selected.has(it.id) ? ' sel' : '';
+  const bg = it.thumb ? `style="background-image:url('${it.thumb}')"` : '';
+  return `<div class="ph${on}" data-id="${esc(it.id)}" data-name="${esc(it.name)}">
+    <div class="img" ${bg}></div><div class="chk">✓</div>
+    <button class="open" data-url="${esc(it.url)}">원본</button>
+    <div class="cap"><b>${esc(it.dept)} › ${esc(it.process)}</b><small>${esc(it.taken.slice(0, 16))} · ${esc(it.author)}</small><small>${esc(it.memo || it.site)}</small></div></div>`;
+}
+$('#btnMore').onclick = () => { page++; doSearch(true); };
+$('#photos').onclick = e => {
+  const o = e.target.closest('.open'); if (o) { window.open(o.dataset.url, '_blank'); return; }
+  const p = e.target.closest('.ph'); if (!p) return;
+  toggle(p, !selected.has(p.dataset.id));
+};
+function toggle(p, on){
+  if (on && !selected.has(p.dataset.id) && selected.size >= MAX_DL) return toast(`한 번에 ${MAX_DL}장까지 내려받을 수 있습니다`);
+  on ? selected.set(p.dataset.id, p.dataset.name) : selected.delete(p.dataset.id);
+  p.classList.toggle('sel', on); updateBar();
+}
+$('#btnAll').onclick = () => document.querySelectorAll('.ph').forEach(p => toggle(p, true));
+$('#btnClear').onclick = () => { selected.clear(); document.querySelectorAll('.ph.sel').forEach(p => p.classList.remove('sel')); updateBar(); };
+function updateBar(){ $('#bar').classList.toggle('show', selected.size > 0); $('#barTxt').textContent = `${selected.size}장 선택`; }
+
+/* ---------- 선택 사진 내려받기 (zip) ---------- */
+$('#btnZip').onclick = async () => {
+  const b = $('#btnZip'); b.disabled = true; b.textContent = '준비 중…';
+  try {
+    const { files } = await call({ action: 'fetch', ids: [...selected.keys()] });
+    const ok = files.filter(f => f.data);
+    if (ok.length === 1) {
+      saveBlob(b64Blob(ok[0].data, 'image/jpeg'), ok[0].name);
+    } else {
+      const zip = new JSZip(); ok.forEach(f => zip.file(f.name, f.data, { base64: true }));
+      saveBlob(await zip.generateAsync({ type: 'blob' }), `현장사진_${ymd(new Date())}_${ok.length}장.zip`);
+    }
+    toast(`${ok.length}장 내려받기 완료${files.length > ok.length ? ` (${files.length - ok.length}장 실패)` : ''}`);
+  } catch (e) { toast('내려받기 실패: ' + e.message, 3500); }
+  finally { b.disabled = false; b.textContent = '내려받기'; }
+};
+function b64Blob(b64, type){ const bin = atob(b64), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Blob([a], { type }); }
+function saveBlob(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+
+if (KEY) login();
+</script>
+</body>
+</html>

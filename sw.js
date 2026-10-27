@@ -1,7 +1,7 @@
 // 앱 화면을 폰에 저장해 두어 현장에서 신호가 약해도 앱이 열리게 합니다.
 // index.html을 수정해 다시 배포할 때는 아래 버전 숫자를 올려 주세요.
-const CACHE = 'sitephoto-v1';
-const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE = 'sitephoto-v7';
+const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './logo.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
