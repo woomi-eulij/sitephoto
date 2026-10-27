@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1C1C1E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="현장사진">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>현장사진</title>
+<style>
+  :root{
+    --bg:#F4F4F1; --card:#FFFFFF; --ink:#151515; --sub:#5E5E5A; --line:#DCDCD6;
+    --accent:#FFC400; --accent-ink:#151515; --dark:#1C1C1E; --ok:#1F8A4C; --warn:#C2410C; --err:#B91C1C;
+    --r:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;
+    font-size:16px;line-height:1.4}
+  header{position:sticky;top:0;z-index:5;background:var(--dark);color:#fff;
+    padding:calc(env(safe-area-inset-top) + 10px) 16px 12px;display:flex;align-items:center;gap:10px}
+  header h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.3px;flex:1}
+  header h1 b{color:var(--accent)}
+  .pill{font-size:13px;font-weight:700;padding:5px 10px;border-radius:99px;background:#3A3A3C;white-space:nowrap}
+  .pill.ok{background:#14532D}.pill.wait{background:#7C2D12}.pill.off{background:#7F1D1D}
+  .iconbtn{background:none;border:0;color:#fff;font-size:22px;padding:4px 6px;cursor:pointer}
+  main{padding:14px 16px calc(env(safe-area-inset-bottom) + 28px);max-width:560px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+  label.t{display:block;font-size:13px;font-weight:800;color:var(--sub);margin:0 0 8px;letter-spacing:.2px}
+  select,input[type=text],input[type=url],input[type=password],input[type=tel]{
+    width:100%;font-size:18px;padding:13px 12px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-family:inherit}
+  select:focus,input:focus{outline:none;border-color:var(--ink)}
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .chip{border:2px solid var(--line);background:#fff;border-radius:10px;padding:13px 4px;font-size:16px;font-weight:700;
+    color:var(--ink);cursor:pointer;font-family:inherit;word-break:keep-all}
+  .chip.on{background:var(--accent);border-color:var(--ink)}
+  .shoot{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-bottom:12px}
+  .btn{border:0;border-radius:var(--r);font-family:inherit;font-weight:800;cursor:pointer;font-size:17px;padding:16px}
+  .btn.big{background:var(--accent);color:var(--accent-ink);font-size:21px;padding:22px 10px;border:2px solid var(--ink)}
+  .btn.sec{background:#fff;color:var(--ink);border:2px solid var(--line)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.dark{background:var(--dark);color:#fff;width:100%}
+  .hint{font-size:14px;color:var(--sub);margin:-4px 0 12px;text-align:center}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+  .stat b{display:block;font-size:26px;font-weight:800}
+  .stat span{font-size:13px;color:var(--sub);font-weight:700}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
+  .row img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#ddd;flex:none}
+  .row .m{flex:1;min-width:0}
+  .row .m b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .m small{display:block;font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .st{font-size:12px;font-weight:800;padding:4px 8px;border-radius:99px;white-space:nowrap}
+  .st.ok{background:#DCFCE7;color:var(--ok)}.st.wait{background:#FFEDD5;color:var(--warn)}.st.err{background:#FEE2E2;color:var(--err)}
+  .row .acts{display:flex;flex-direction:column;gap:4px}
+  .row .acts button{font-size:12px;font-weight:800;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 8px;font-family:inherit}
+  h2{font-size:15px;margin:18px 2px 8px;color:var(--sub);font-weight:800}
+  .empty{text-align:center;color:var(--sub);font-size:14px;padding:16px}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translateX(-50%) translateY(20px);
+    background:var(--dark);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;font-size:15px;opacity:0;transition:.25s;
+    z-index:20;max-width:90vw;text-align:center;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  dialog{border:0;border-radius:18px;padding:0;width:min(92vw,460px)}
+  dialog::backdrop{background:rgba(0,0,0,.5)}
+  .dlg{padding:18px}
+  .dlg h3{margin:0 0 14px;font-size:20px}
+  .field{margin-bottom:14px}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700}
+  .switch input{width:24px;height:24px}
+  .dlg .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+  .err-msg{color:var(--err);font-weight:700;font-size:14px;min-height:20px;margin:4px 0 8px}
+  input[type=file]{display:none}
+  .busy{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:30;color:#fff;font-weight:800;font-size:18px}
+  .busy.show{display:flex}
+</style>
+</head>
+<body>
+<header>
+  <h1>현장<b>사진</b></h1>
+  <span id="netPill" class="pill">확인 중</span>
+  <button class="iconbtn" id="btnSettings" aria-label="설정">⚙︎</button>
+</header>
+
+<main>
+  <div class="card">
+    <label class="t" for="site">현장</label>
+    <select id="site"></select>
+  </div>
+
+  <div class="card">
+    <label class="t">공정 <span style="font-weight:600">— 먼저 선택하세요</span></label>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="card">
+    <label class="t" for="memo">메모 (선택) — 파일명에 들어갑니다</label>
+    <input type="text" id="memo" placeholder="예: 3층 슬래브, B동 북측" maxlength="30">
+  </div>
+
+  <div class="shoot">
+    <button class="btn big" id="btnShoot" disabled>📷 촬영</button>
+    <button class="btn sec" id="btnAlbum" disabled>🖼 앨범</button>
+  </div>
+  <p class="hint" id="hint">공정을 선택하면 촬영할 수 있습니다</p>
+  <input type="file" id="fileCam" accept="image/*" capture="environment">
+  <input type="file" id="fileAlbum" accept="image/*" multiple>
+
+  <div class="stats">
+    <div class="stat"><b id="cntWait">0</b><span>업로드 대기</span></div>
+    <div class="stat"><b id="cntToday">0</b><span>오늘 저장 완료</span></div>
+  </div>
+
+  <h2>최근 사진</h2>
+  <div class="list" id="list"></div>
+</main>
+
+<dialog id="dlg">
+  <form class="dlg" method="dialog" id="setForm">
+    <h3>설정</h3>
+    <div class="field">
+      <label class="t" for="fName">내 이름</label>
+      <input type="text" id="fName" placeholder="홍길동" maxlength="12" required>
+    </div>
+    <div class="field">
+      <label class="t" for="fKey">접속코드</label>
+      <input type="tel" id="fKey" placeholder="관리자에게 받은 6자리" required>
+    </div>
+    <div class="field" id="urlField">
+      <label class="t" for="fUrl">서버 주소 (관리자용)</label>
+      <input type="url" id="fUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div class="field switch">
+      <span>사진에 날짜·현장·공정 표시</span>
+      <input type="checkbox" id="fWm">
+    </div>
+    <div class="err-msg" id="setErr"></div>
+    <div class="btns">
+      <button class="btn sec" type="button" id="btnCancel">닫기</button>
+      <button class="btn dark" type="submit" id="btnSave">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="busy" id="busy">사진 준비 중…</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 관리자: 배포 전에 Apps Script 웹앱 주소를 여기에 넣으면 직원은 이름·코드만 입력하면 됩니다 ===== */
+const DEFAULT_SERVER_URL = 'https://script.google.com/macros/s/AKfycbw5V6kQGX6P131yanhHvuiuZ7o6l8bkg9WxVZ6aF0a-m8we6eNIr9e7CxgFNeZ3BEQPGA/exec';
+
+const MAX_SIDE = 2048;      // 긴 변 최대 픽셀 (용량 절감)
+const JPEG_Q = 0.82;        // JPEG 품질
+const $ = s => document.querySelector(s);
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+let settings = LS.get('settings', { url: DEFAULT_SERVER_URL, key: '', name: '', wm: true });
+if (!settings.url && DEFAULT_SERVER_URL) settings.url = DEFAULT_SERVER_URL;
+let config = LS.get('config', { sites: [], processes: [] });
+let sel = LS.get('sel', { site: '', process: '' });
+
+/* ---------- IndexedDB 업로드 대기열 ---------- */
+const DB = (() => {
+  let dbp;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open('sitephoto', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('queue', { keyPath: 'id' });
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  }));
+  const tx = async (mode, fn) => {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const t = db.transaction('queue', mode); const s = t.objectStore('queue');
+      const r = fn(s);
+      t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error);
+    });
+  };
+  return {
+    all: () => tx('readonly', s => s.getAll()),
+    put: item => tx('readwrite', s => s.put(item)),
+    del: id => tx('readwrite', s => s.delete(id)),
+  };
+})();
+
+/* ---------- 화면 ---------- */
+function toast(msg, ms = 2200){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+function renderPickers(){
+  const s = $('#site');
+  s.innerHTML = config.sites.length
+    ? config.sites.map(x => `<option ${x === sel.site ? 'selected' : ''}>${esc(x)}</option>`).join('')
+    : '<option value="">현장 목록을 불러오는 중…</option>';
+  if (!config.sites.includes(sel.site)) sel.site = config.sites[0] || '';
+  if (!config.processes.includes(sel.process)) sel.process = '';
+  $('#chips').innerHTML = config.processes.map(p =>
+    `<button type="button" class="chip ${p === sel.process ? 'on' : ''}" data-p="${esc(p)}">${esc(p)}</button>`).join('');
+  updateShootState();
+}
+
+function updateShootState(){
+  const ready = sel.site && sel.process;
+  $('#btnShoot').disabled = !ready; $('#btnAlbum').disabled = !ready;
+  $('#hint').textContent = ready ? `${sel.site} › ${sel.process} 폴더로 저장됩니다` : '공정을 선택하면 촬영할 수 있습니다';
+}
+
+async function renderList(){
+  const q = (await DB.all()).sort((a, b) => b.takenAt - a.takenAt);
+  const done = LS.get('done', []);
+  const today = new Date().toDateString();
+  $('#cntWait').textContent = q.length;
+  $('#cntToday').textContent = done.filter(d => new Date(d.takenAt).toDateString() === today).length;
+
+  const rows = [
+    ...q.map(i => ({ ...i, _q: true })),
+    ...done.slice(0, 30)
+  ];
+  $('#list').innerHTML = rows.length ? rows.map(i => {
+    const when = new Date(i.takenAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    let st;
+    if (!i._q) st = `<span class="st ok">저장됨</span>`;
+    else if (i.status === 'fatal') st = `<span class="st err">확인 필요</span>`;
+    else st = `<span class="st wait">${i.tries ? '재시도 대기' : '대기'}</span>`;
+    const sub = i._q && i.error ? esc(i.error) : `${when} · ${esc(i.memo || '')}`;
+    const acts = i._q && i.status === 'fatal'
+      ? `<div class="acts"><button data-retry="${i.id}">다시</button><button data-del="${i.id}">삭제</button></div>` : '';
+    const open = !i._q && i.url ? `onclick="window.open('${i.url}','_blank')"` : '';
+    return `<div class="row" ${open}><img src="${i.thumb}" alt=""><div class="m"><b>${esc(i.site)} › ${esc(i.process)}</b><small>${sub}</small></div>${st}${acts}</div>`;
+  }).join('') : '<div class="empty">아직 찍은 사진이 없습니다</div>';
+  updatePill(q);
+}
+
+function updatePill(q){
+  const p = $('#netPill');
+  if (!navigator.onLine){ p.className = 'pill off'; p.textContent = '오프라인 · 폰에 보관'; return; }
+  if (q && q.length){ p.className = 'pill wait'; p.textContent = `업로드 중 ${q.length}`; return; }
+  p.className = 'pill ok'; p.textContent = '연결됨';
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---------- 서버 ---------- */
+async function loadConfig(fresh){
+  if (!settings.url || !settings.key) return false;
+  try {
+    const r = await fetch(`${settings.url}?action=config&key=${encodeURIComponent(settings.key)}${fresh ? '&fresh=1' : ''}`);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '설정을 불러오지 못했습니다');
+    config = { sites: j.sites, processes: j.processes };
+    LS.set('config', config);
+    renderPickers();
+    return true;
+  } catch (e) {
+    if (!config.sites.length) toast('현장 목록을 불러오지 못했습니다: ' + e.message, 3500);
+    throw e;
+  }
+}
+
+let pumping = false;
+async function pump(){
+  if (pumping || !navigator.onLine || !settings.url) return;
+  pumping = true;
+  try {
+    while (true) {
+      const now = Date.now();
+      const items = (await DB.all())
+        .filter(i => i.status !== 'fatal' && (i.nextTry || 0) <= now)
+        .sort((a, b) => a.takenAt - b.takenAt);
+      if (!items.length) break;
+      const it = items[0];
+      try {
+        const res = await fetch(settings.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            key: settings.key, id: it.id, site: it.site, process: it.process,
+            memo: it.memo, author: it.author, takenAt: it.takenAt, data: it.data
+          })
+        });
+        const j = await res.json();
+        if (j.ok) {
+          await DB.del(it.id);
+          const done = LS.get('done', []);
+          done.unshift({ id: it.id, site: it.site, process: it.process, memo: it.memo, takenAt: it.takenAt, thumb: it.thumb, url: j.url });
+          LS.set('done', done.slice(0, 60));
+        } else if (j.fatal) {
+          await DB.put({ ...it, status: 'fatal', error: j.error });
+        } else {
+          throw new Error(j.error || '서버 오류');
+        }
+      } catch (e) {
+        const tries = (it.tries || 0) + 1;
+        const wait = Math.min(15 * 60e3, 10e3 * 2 ** Math.min(tries, 7));
+        await DB.put({ ...it, tries, nextTry: Date.now() + wait, error: '전송 실패 · 자동 재시도' });
+        if (!navigator.onLine) break;
+      }
+      await renderList();
+    }
+  } finally {
+    pumping = false;
+    renderList();
+  }
+}
+
+/* ---------- 사진 처리 ---------- */
+async function loadImage(file){
+  if ('createImageBitmap' in window) {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) {}
+  }
+  return new Promise((res, rej) => {
+    const img = new Image(); const u = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(u); res(img); };
+    img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('사진을 열 수 없습니다')); };
+    img.src = u;
+  });
+}
+
+function blobToBase64(blob){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1]);
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+
+async function prepare(file, meta){
+  const img = await loadImage(file);
+  const w0 = img.width, h0 = img.height;
+  const k = Math.min(1, MAX_SIDE / Math.max(w0, h0));
+  const w = Math.round(w0 * k), h = Math.round(h0 * k);
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d');
+  g.drawImage(img, 0, 0, w, h);
+
+  if (settings.wm) {
+    const d = new Date(meta.takenAt);
+    const p2 = n => String(n).padStart(2, '0');
+    const line1 = `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+    const line2 = `${meta.site} · ${meta.process}${meta.memo ? ' · ' + meta.memo : ''} · ${meta.author}`;
+    const fs = Math.max(18, Math.round(Math.min(w, h) * 0.032));
+    const pad = Math.round(fs * 0.6), boxH = fs * 2 + pad * 3;
+    g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(0, h - boxH, w, boxH);
+    g.fillStyle = '#FFC400'; g.font = `800 ${fs}px sans-serif`; g.textBaseline = 'top';
+    g.fillText(line1, pad, h - boxH + pad);
+    g.fillStyle = '#FFFFFF'; g.font = `700 ${fs}px sans-serif`;
+    g.fillText(line2, pad, h - boxH + pad * 2 + fs, w - pad * 2);
+  }
+
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', JPEG_Q));
+  const data = await blobToBase64(blob);
+
+  const tk = 120 / Math.max(w, h);
+  const t = document.createElement('canvas'); t.width = Math.round(w * tk); t.height = Math.round(h * tk);
+  t.getContext('2d').drawImage(c, 0, 0, t.width, t.height);
+  const thumb = t.toDataURL('image/jpeg', 0.6);
+  if (img.close) img.close();
+  return { data, thumb };
+}
+
+async function handleFiles(files){
+  if (!files || !files.length) return;
+  if (!sel.site || !sel.process) return toast('현장과 공정을 먼저 선택하세요');
+  $('#busy').classList.add('show');
+  let n = 0;
+  try {
+    for (const f of files) {
+      const takenAt = (f.lastModified && Math.abs(Date.now() - f.lastModified) < 365 * 864e5) ? f.lastModified : Date.now();
+      const meta = { site: sel.site, process: sel.process, memo: $('#memo').value.trim(), author: settings.name, takenAt };
+      const { data, thumb } = await prepare(f, meta);
+      const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+      await DB.put({ id, ...meta, data, thumb, status: 'wait', tries: 0 });
+      n++;
+    }
+    toast(navigator.onLine ? `${n}장 저장 중…` : `${n}장 폰에 보관 · 연결되면 자동 업로드`);
+  } catch (e) {
+    toast('사진 처리 실패: ' + e.message, 3500);
+  } finally {
+    $('#busy').classList.remove('show');
+    await renderList();
+    pump();
+  }
+}
+
+/* ---------- 설정 창 ---------- */
+function openSettings(force){
+  $('#fName').value = settings.name || '';
+  $('#fKey').value = settings.key || '';
+  $('#fUrl').value = settings.url || '';
+  $('#fWm').checked = !!settings.wm;
+  $('#urlField').style.display = (DEFAULT_SERVER_URL && settings.url === DEFAULT_SERVER_URL) ? 'none' : '';
+  $('#btnCancel').style.display = force ? 'none' : '';
+  $('#setErr').textContent = '';
+  $('#dlg').showModal();
+}
+
+$('#setForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const next = {
+    name: $('#fName').value.trim(), key: $('#fKey').value.trim(),
+    url: ($('#fUrl').value.trim() || DEFAULT_SERVER_URL), wm: $('#fWm').checked
+  };
+  if (!next.name || !next.key || !next.url) { $('#setErr').textContent = '이름, 접속코드, 서버 주소를 모두 입력하세요'; return; }
+  $('#btnSave').disabled = true; $('#setErr').textContent = '연결 확인 중…';
+  const prev = settings; settings = next;
+  try {
+    await loadConfig(true);
+    LS.set('settings', settings);
+    $('#dlg').close();
+    toast('설정 저장 완료');
+    pump();
+  } catch (err) {
+    settings = prev;
+    $('#setErr').textContent = err.message || '연결 실패';
+  } finally { $('#btnSave').disabled = false; }
+});
+$('#btnCancel').onclick = () => $('#dlg').close();
+$('#btnSettings').onclick = () => openSettings(false);
+
+/* ---------- 이벤트 ---------- */
+$('#site').onchange = e => { sel.site = e.target.value; LS.set('sel', sel); updateShootState(); };
+$('#chips').onclick = e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  sel.process = b.dataset.p; LS.set('sel', sel);
+  document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+  updateShootState();
+};
+$('#btnShoot').onclick = () => $('#fileCam').click();
+$('#btnAlbum').onclick = () => $('#fileAlbum').click();
+['#fileCam', '#fileAlbum'].forEach(s => $(s).onchange = e => { const f = [...e.target.files]; e.target.value = ''; handleFiles(f); });
+$('#list').onclick = async e => {
+  const r = e.target.dataset.retry, d = e.target.dataset.del;
+  if (r) { const it = (await DB.all()).find(x => x.id === r); if (it) await DB.put({ ...it, status: 'wait', tries: 0, nextTry: 0, error: '' }); await loadConfig(true).catch(() => {}); pump(); }
+  if (d && confirm('이 사진을 삭제할까요? (드라이브에 저장되지 않은 사진입니다)')) { await DB.del(d); renderList(); }
+  if (r || d) e.stopPropagation();
+};
+window.addEventListener('online', () => { renderList(); pump(); });
+window.addEventListener('offline', () => renderList());
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { loadConfig().catch(() => {}); pump(); } });
+setInterval(pump, 20000);
+
+/* ---------- 시작 ---------- */
+(async () => {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  renderPickers();
+  await renderList();
+  if (!settings.key || !settings.name || !settings.url) openSettings(true);
+  else { loadConfig().catch(() => {}); pump(); }
+})();
+</script>
+</body>
+</html>
