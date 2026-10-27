@@ -733,7 +733,45 @@ setInterval(pump, 20000);
   await renderList();
   if (!settings.key || !settings.name || !settings.url) openSettings(true);
   else { loadConfig().catch(() => {}); pump(); }
+  checkMove(); setInterval(checkMove, 3000);
 })();
+
+/* ---------- 새 주소로 이동 안내 ---------- */
+// 이 주소는 곧 닫힙니다. 폰에 남은 사진을 모두 올린 뒤 새 주소로 안내하고,
+// 이름·접속코드는 주소 뒤(#)에 붙여 넘겨 새 앱에서 다시 입력하지 않게 합니다.
+const NEW_URL = 'https://sitephoto-app.pages.dev/';
+function moveLink(){
+  const p = new URLSearchParams({ move: '1' });
+  if (settings.name && settings.key) {
+    p.set('name', settings.name); p.set('key', settings.key);
+    p.set('wm', settings.wm ? '1' : '0'); p.set('save', settings.saveLocal === false ? '0' : '1');
+  }
+  return NEW_URL + '#' + p;
+}
+async function checkMove(){
+  const left = (await DB.all()).length;
+  let box = document.getElementById('moveBox');
+  if (!box) {
+    box = document.createElement('div'); box.id = 'moveBox';
+    document.body.appendChild(box);
+  }
+  if (left) {
+    box.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:40;background:#FFC400;color:#14213D;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;font-size:14.5px;font-weight:700;line-height:1.45;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.15)';
+    box.innerHTML = `앱 주소가 바뀝니다.<br>아직 올라가지 않은 사진 <b>${left}장</b>이 있습니다. 인터넷에 연결된 채로 기다리면 자동으로 올라가고, 끝나면 새 주소로 안내합니다.`;
+    return;
+  }
+  box.style.cssText = 'position:fixed;inset:0;z-index:40;background:#F2F5F9;display:flex;align-items:center;justify-content:center;padding:24px';
+  box.innerHTML = `<div style="background:#fff;border-radius:22px;border-top:5px solid #004A99;padding:28px 22px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(20,33,61,.12)">
+    <h3 style="margin:0 0 10px;font-size:22px;color:#14213D">앱 주소가 바뀌었습니다</h3>
+    <p style="margin:0 0 18px;color:#5B6678;font-size:15px;line-height:1.55">새 주소에서 계속 사용하세요.<br>이름과 접속코드는 자동으로 옮겨집니다.</p>
+    <a href="${moveLink()}" style="display:block;background:#004A99;color:#fff;text-decoration:none;font-weight:700;font-size:18px;padding:17px;border-radius:14px">새 주소로 이동</a>
+    <ol style="text-align:left;margin:18px 0 0;padding-left:20px;color:#14213D;font-size:14px;line-height:1.7">
+      <li>새 주소가 열리면 브라우저 메뉴에서 <b>홈 화면에 추가</b>를 누르세요.</li>
+      <li>홈 화면의 <b>예전 아이콘은 삭제</b>하세요.</li>
+    </ol>
+    <p style="margin:14px 0 0;color:#5B6678;font-size:12.5px;word-break:break-all">새 주소: ${NEW_URL}</p>
+  </div>`;
+}
 </script>
 </body>
 </html>
