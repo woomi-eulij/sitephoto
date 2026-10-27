@@ -224,7 +224,7 @@ function card(it){
   return `<div class="ph${on}" data-id="${esc(it.id)}" data-name="${esc(it.name)}">
     <div class="img" ${bg}></div><div class="chk">✓</div>
     <button class="open" data-url="${esc(it.url)}">원본</button>
-    <div class="cap"><b>${esc(it.dept)} › ${esc(it.process)}</b><small>${esc(it.taken.slice(0, 16))} · ${esc(it.author)}</small><small>${esc(it.memo || it.site)}</small></div></div>`;
+    <div class="cap"><b>${esc(it.dept)} › ${esc(it.process)}${it.loc ? ' › ' + esc(it.loc) : ''}</b><small>${esc(it.taken.slice(0, 16))} · ${esc(it.author)}</small><small>${esc(it.memo || it.site)}</small></div></div>`;
 }
 $('#btnMore').onclick = () => { page++; doSearch(true); };
 $('#photos').onclick = e => {

@@ -46,6 +46,13 @@
   .chip{border:1px solid var(--line);background:#F8FAFD;border-radius:12px;padding:13px 4px;font-size:15.5px;font-weight:700;
     color:var(--ink);cursor:pointer;font-family:inherit;word-break:keep-all}
   .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .chip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .chip.add{border-style:dashed;border-color:#9FB3CF;background:#fff;color:var(--navy)}
+  .chips.sm .chip{padding:10px 4px;font-size:14.5px}
+  .siterow{display:flex;gap:8px;align-items:center}.siterow select{flex:1}
+  .siterow .iconbtn{width:48px;height:48px;font-size:20px;font-weight:700}
+  .locrow{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+  .tipline{font-size:12px;color:var(--sub);margin:10px 2px 0}
   .shoot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
   .shoot .btn{font-size:19px;padding:20px 10px}
   .btn{border:0;border-radius:14px;font-family:inherit;font-weight:700;cursor:pointer;font-size:16px;padding:15px;
@@ -135,12 +142,17 @@
 <main>
   <div class="card top">
     <label class="t" for="site">현장</label>
-    <select id="site"></select>
+    <div class="siterow"><select id="site"></select><button class="iconbtn" id="siteEdit" aria-label="현장 이름 변경">✎</button><button class="iconbtn" id="siteAdd" aria-label="현장 추가">＋</button></div>
   </div>
 
   <div class="card">
     <label class="t">공정 <em>· 먼저 선택하세요</em></label>
     <div class="chips" id="chips"></div>
+    <div class="locrow" id="locWrap" hidden>
+      <label class="t">세부 위치 <em>· 선택하면 공정 아래 폴더로 나뉩니다</em></label>
+      <div class="chips sm" id="locs"></div>
+    </div>
+    <p class="tipline">공정·세부 위치 버튼을 <b>길게 누르면</b> 이름을 바꿀 수 있습니다</p>
   </div>
 
   <div class="card">
@@ -230,8 +242,9 @@ const LS = {
 
 let settings = LS.get('settings', { url: DEFAULT_SERVER_URL, key: '', name: '', wm: true });
 if (!settings.url && DEFAULT_SERVER_URL) settings.url = DEFAULT_SERVER_URL;
-let config = LS.get('config', { sites: [], processes: [] });
-let sel = LS.get('sel', { site: '', process: '' });
+let config = LS.get('config', { sites: [], processes: [], locs: {} });
+if (!config.locs) config.locs = {};
+let sel = LS.get('sel', { site: '', process: '', loc: '' });
 
 /* ---------- IndexedDB 업로드 대기열 ---------- */
 const DB = (() => {
@@ -271,15 +284,28 @@ function renderPickers(){
   if (!config.sites.includes(sel.site)) sel.site = config.sites[0] || '';
   if (!config.processes.includes(sel.process)) sel.process = '';
   $('#chips').innerHTML = config.processes.map(p =>
-    `<button type="button" class="chip ${p === sel.process ? 'on' : ''}" data-p="${esc(p)}">${esc(p)}</button>`).join('');
+    `<button type="button" class="chip ${p === sel.process ? 'on' : ''}" data-p="${esc(p)}">${esc(p)}</button>`).join('')
+    + (config.sites.length ? `<button type="button" class="chip add" data-add="process">＋ 공정 추가</button>` : '');
+  renderLocs();
   updateShootState();
+}
+function locList(){ return config.locs[`${sel.site}|${sel.process}`] || []; }
+function renderLocs(){
+  const wrap = $('#locWrap');
+  if (!sel.site || !sel.process) { wrap.hidden = true; sel.loc = ''; return; }
+  const list = locList();
+  if (!list.includes(sel.loc)) sel.loc = '';
+  wrap.hidden = false;
+  $('#locs').innerHTML = `<button type="button" class="chip ${sel.loc ? '' : 'on'}" data-l="">없음</button>`
+    + list.map(l => `<button type="button" class="chip ${l === sel.loc ? 'on' : ''}" data-l="${esc(l)}">${esc(l)}</button>`).join('')
+    + `<button type="button" class="chip add" data-add="loc">＋ 새 위치</button>`;
 }
 
 function updateShootState(){
   const ready = sel.site && sel.process;
   $('#btnShoot').disabled = !ready; $('#btnAlbum').disabled = !ready;
   const dp = settings.dept ? `${esc(settings.dept)} › ` : '';
-  $('#hint').innerHTML = ready ? `<b>${dp}${esc(sel.site)} › ${esc(sel.process)}</b> 폴더로 저장됩니다` : '공정을 선택하면 촬영할 수 있습니다';
+  $('#hint').innerHTML = ready ? `<b>${dp}${esc(sel.site)} › ${esc(sel.process)}${sel.loc ? ' › ' + esc(sel.loc) : ''}</b> 폴더로 저장됩니다` : '공정을 선택하면 촬영할 수 있습니다';
   $('#who').textContent = settings.name ? `${settings.dept ? settings.dept + ' · ' : ''}${settings.name}` : '현장기록 · 사진관리';
 }
 
@@ -304,7 +330,7 @@ async function renderList(){
     const acts = i._q && i.status === 'fatal'
       ? `<div class="acts"><button data-retry="${i.id}">다시</button><button data-del="${i.id}">삭제</button></div>`
       : (!i._q && i.fileId ? `<button class="del" data-fid="${i.fileId}">삭제</button>` : '');
-    return `<div class="row"><img src="${i.thumb}" alt=""><div class="m"><b>${esc(i.process)}</b><small>${sub}</small></div>${st}${acts}</div>`;
+    return `<div class="row"><img src="${i.thumb}" alt=""><div class="m"><b>${esc(i.process)}${i.loc ? ' › ' + esc(i.loc) : ''}</b><small>${sub}</small></div>${st}${acts}</div>`;
   }).join('') : '<div class="empty">아직 찍은 사진이 없습니다</div>';
   updatePill(q);
 }
@@ -325,7 +351,7 @@ async function loadConfig(fresh){
     const r = await fetch(`${settings.url}?action=config&key=${encodeURIComponent(settings.key)}&name=${encodeURIComponent(settings.name)}${fresh ? '&fresh=1' : ''}`);
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '설정을 불러오지 못했습니다');
-    config = { sites: j.sites, processes: j.processes };
+    config = { sites: j.sites, processes: j.processes, locs: j.locs || {} };
     LS.set('config', config);
     if (j.dept && settings.dept !== j.dept) { settings.dept = j.dept; LS.set('settings', settings); }
     renderPickers();
@@ -363,14 +389,14 @@ async function worker(){
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             key: settings.key, device: DEVICE, id: it.id, site: it.site, process: it.process,
-            memo: it.memo, author: it.author, takenAt: it.takenAt, data: it.data
+            loc: it.loc || '', memo: it.memo, author: it.author, takenAt: it.takenAt, data: it.data
           })
         });
         const j = await res.json();
         if (j.ok) {
           await DB.del(it.id);
           const done = LS.get('done', []);
-          done.unshift({ id: it.id, site: it.site, process: it.process, memo: it.memo, takenAt: it.takenAt, thumb: it.thumb, url: j.url, fileId: j.fileId });
+          done.unshift({ id: it.id, site: j.site || it.site, process: j.process || it.process, loc: j.loc || it.loc || '', memo: it.memo, takenAt: it.takenAt, thumb: it.thumb, url: j.url, fileId: j.fileId });
           LS.set('done', done.slice(0, 60));
         } else if (j.fatal) {
           await DB.put({ ...it, status: 'fatal', error: j.error });
@@ -452,7 +478,7 @@ async function handleFiles(files){
   try {
     for (const f of files) {
       const takenAt = (f.lastModified && Math.abs(Date.now() - f.lastModified) < 365 * 864e5) ? f.lastModified : Date.now();
-      const meta = { site: sel.site, process: sel.process, memo: $('#memo').value.trim(), author: settings.name, takenAt };
+      const meta = { site: sel.site, process: sel.process, loc: sel.loc, memo: $('#memo').value.trim(), author: settings.name, takenAt };
       const { data, thumb } = await prepare(f, meta);
       const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
       await DB.put({ id, ...meta, data, thumb, status: 'wait', tries: 0 });
@@ -507,13 +533,95 @@ $('#btnCancel').onclick = () => $('#dlg').close();
 $('#btnSettings').onclick = () => openSettings(false);
 
 /* ---------- 이벤트 ---------- */
-$('#site').onchange = e => { sel.site = e.target.value; LS.set('sel', sel); updateShootState(); };
+$('#site').onchange = e => { sel.site = e.target.value; sel.loc = ''; LS.set('sel', sel); renderLocs(); updateShootState(); };
 $('#chips').onclick = e => {
-  const b = e.target.closest('.chip'); if (!b) return;
+  const b = e.target.closest('.chip'); if (!b || longFired(b)) return;
+  if (b.dataset.add) return addItem('process');
+  if (sel.process !== b.dataset.p) sel.loc = '';
   sel.process = b.dataset.p; LS.set('sel', sel);
-  document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+  $('#chips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+  renderLocs(); updateShootState();
+};
+$('#locs').onclick = e => {
+  const b = e.target.closest('.chip'); if (!b || longFired(b)) return;
+  if (b.dataset.add) return addItem('loc');
+  sel.loc = b.dataset.l; LS.set('sel', sel);
+  $('#locs').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
   updateShootState();
 };
+$('#siteAdd').onclick = () => addItem('site');
+$('#siteEdit').onclick = () => sel.site && renameItem('site', sel.site);
+
+/* ---------- 길게 눌러 이름 변경 ---------- */
+let pressTimer = null, firedEl = null, firedAt = 0;
+function longFired(el){ if (firedEl === el && Date.now() - firedAt < 1200) { firedEl = null; return true; } return false; }
+function triggerRename(el){
+  if (firedEl === el && Date.now() - firedAt < 1200) return;
+  firedEl = el; firedAt = Date.now();
+  if (el.dataset.p) renameItem('process', el.dataset.p);
+  else if (el.dataset.l) renameItem('loc', el.dataset.l);
+}
+['#chips', '#locs'].forEach(id => {
+  const box = $(id);
+  box.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.chip'); if (!el || el.dataset.add || el.dataset.l === '' || e.button) return;
+    clearTimeout(pressTimer); pressTimer = setTimeout(() => triggerRename(el), 550);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => box.addEventListener(t, () => clearTimeout(pressTimer)));
+  box.addEventListener('contextmenu', e => {
+    const el = e.target.closest('.chip'); if (!el) return;
+    e.preventDefault(); if (!el.dataset.add && el.dataset.l !== '') triggerRename(el);
+  });
+});
+
+/* ---------- 추가 · 이름 변경 ---------- */
+const KO = { process: '공정', site: '현장', loc: '세부 위치' };
+const nkey = s => String(s || '').replace(/\s+/g, '').toLowerCase();
+function listOf(kind){ return kind === 'process' ? config.processes : kind === 'site' ? config.sites : locList(); }
+function checkName(kind, name, except){
+  if (!name) return false;
+  if (name.length > 20) { alert('이름은 20자 이내로 입력하세요'); return false; }
+  if (/[\\/:*?"<>|]/.test(name)) { alert('이름에 \\ / : * ? " < > | 기호는 쓸 수 없습니다'); return false; }
+  const others = listOf(kind).filter(x => x !== except);
+  const same = others.find(x => nkey(x) === nkey(name));
+  if (same) { alert(`이미 있는 ${KO[kind]}입니다: ${same}`); return false; }
+  const like = others.find(x => nkey(x).includes(nkey(name)) || nkey(name).includes(nkey(x)));
+  if (like && !confirm(`비슷한 이름 '${like}'이(가) 이미 있습니다.\n그래도 '${name}'(으)로 할까요?`)) return false;
+  return true;
+}
+async function editCall(body, busyText){
+  if (!navigator.onLine) { toast('연결된 상태에서만 바꿀 수 있습니다'); return null; }
+  $('#busy').textContent = busyText; $('#busy').classList.add('show');
+  try {
+    const j = await api({ author: settings.name, site: sel.site, process: sel.process, ...body });
+    if (!j.ok) throw new Error(j.error || '실패했습니다');
+    config = { sites: j.sites, processes: j.processes, locs: j.locs || {} }; LS.set('config', config);
+    return j;
+  } catch (e) { alert(e.message); return null; }
+  finally { $('#busy').classList.remove('show'); $('#busy').textContent = '사진 준비 중…'; }
+}
+async function addItem(kind){
+  if (kind === 'loc' && !sel.process) return toast('공정을 먼저 고르세요');
+  const where = kind === 'loc' ? `\n(${sel.process} 아래에 만들어집니다)` : kind === 'process' ? `\n(${settings.dept || '내'} 부서 공정으로 추가됩니다)` : '';
+  const name = (prompt(`새 ${KO[kind]} 이름을 입력하세요 (20자 이내)${where}`) || '').trim().replace(/\s+/g, ' ');
+  if (!checkName(kind, name)) return;
+  const j = await editCall({ action: 'add', kind, name }, '추가하는 중…');
+  if (!j) return;
+  if (kind === 'process') { sel.process = name; sel.loc = ''; }
+  if (kind === 'site') { sel.site = name; sel.loc = ''; }
+  if (kind === 'loc') sel.loc = name;
+  LS.set('sel', sel); renderPickers(); toast(`'${name}' ${KO[kind]}을(를) 추가했습니다`);
+}
+async function renameItem(kind, from){
+  const to = (prompt(`'${from}' 이름을 무엇으로 바꿀까요?\n이미 저장된 사진 폴더 이름도 함께 바뀝니다.`, from) || '').trim().replace(/\s+/g, ' ');
+  if (!to || to === from || !checkName(kind, to, from)) return;
+  const j = await editCall({ action: 'rename', kind, from, to }, '이름 바꾸는 중…');
+  if (!j) return;
+  if (kind === 'process' && sel.process === from) sel.process = to;
+  if (kind === 'site' && sel.site === from) sel.site = to;
+  if (kind === 'loc' && sel.loc === from) sel.loc = to;
+  LS.set('sel', sel); renderPickers(); toast(`'${from}' → '${to}' 바꿨습니다`);
+}
 $('#btnShoot').onclick = () => $('#fileCam').click();
 $('#btnAlbum').onclick = () => $('#fileAlbum').click();
 ['#fileCam', '#fileAlbum'].forEach(s => $(s).onchange = e => {
@@ -590,7 +698,7 @@ async function loadMine(){
     j.items.forEach(it => {
       const day = it.taken.slice(0, 10);
       if (day !== mineLastDay) { mineLastDay = day; html += `<div class="dayhead">${day}</div>`; }
-      html += `<div class="row"><img src="${it.thumb || ''}" alt=""><div class="m"><b>${esc(it.process)}</b><small>${it.taken.slice(11, 16)} · ${esc(it.memo || '')}</small></div><button class="del" data-fid="${esc(it.id)}">삭제</button></div>`;
+      html += `<div class="row"><img src="${it.thumb || ''}" alt=""><div class="m"><b>${esc(it.process)}${it.loc ? ' › ' + esc(it.loc) : ''}</b><small>${it.taken.slice(11, 16)} · ${esc(it.memo || '')}</small></div><button class="del" data-fid="${esc(it.id)}">삭제</button></div>`;
     });
     box.insertAdjacentHTML('beforeend', html);
     if (j.more) more.style.display = '';
